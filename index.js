@@ -4,10 +4,10 @@ const isAbsoluteUrl = require('is-absolute-url');
 const url = require('url');
 const path = require('path');
 
-const togpx = require('togpx');
-const tokml = require('tokml');
 const DOMParser = require('xmldom').DOMParser;
-const tj = require('@tmcw/togeojson');
+const toGPX = require('togpx');
+const toKML = require('tokml');
+const toGeoJSON = require('@tmcw/togeojson');
 
 if (!process.env.PORT) {
   console.error('No env PORT defined');
@@ -37,24 +37,22 @@ app.get('/download.:format(gpx|kml)$', (req, res) => {
     const doc = new DOMParser().parseFromString((await got(source)).body);
 
     if (from === 'kml') {
-      const converted = tj.kml(doc, {styles: true});
+      const converted = toGeoJSON.kml(doc, {styles: true});
 
       if (to === 'gpx') {
-        return res.send(togpx(converted, {
+        return res.send(toGPX(converted, {
           featureDescription: () => '',
         }));
       }
     }
 
     if (from === 'gpx') {
-      const converted = tj.gpx(doc, {styles: true});
+      const converted = toGeoJSON.gpx(doc, {styles: true});
 
       if (to === 'kml') {
-        return res.send(tokml(converted));
+        return res.send(toKML(converted));
       }
     }
-
-    // return got.stream(source).pipe(geo.from(from)).pipe(geo.to(to)).pipe(res);
 
     res.send(400);
   };
