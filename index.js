@@ -40,7 +40,9 @@ app.get('/download.:format(gpx|kml)$', (req, res) => {
       const converted = tj.kml(doc, {styles: true});
 
       if (to === 'gpx') {
-        return res.send(togpx(converted));
+        return res.send(togpx(converted, {
+          featureDescription: () => '',
+        }));
       }
     }
 
