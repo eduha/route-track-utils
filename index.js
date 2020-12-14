@@ -23,6 +23,13 @@ app.get('/download.:format(gpx|kml)$', (req, res) => {
 
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
+    if (to === 'kml') {
+      res.setHeader('Content-type', 'application/vnd.google-earth.kml+xml');
+    }
+    else if (to === 'gpx') {
+      res.setHeader('Content-type', 'application/gpx+xml');
+    }
+
     if (from === to) {
       return got.stream(source).pipe(res);
     }
