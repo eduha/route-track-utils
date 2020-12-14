@@ -1,0 +1,29 @@
+{
+  "name": "route-track-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eduha/route-track-utils.git"
+  },
+  "author": "Eduard Faber",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eduha/route-track-utils/issues"
+  },
+  "homepage": "https://github.com/eduha/route-track-utils#readme",
+  "dependencies": {
+    "@tmcw/togeojson": "^4.2.0",
+    "express": "^4.17.1",
+    "got": "^11.8.1",
+    "is-absolute-url": "^3.0.3",
+    "node-geo-distance": "^1.2.0",
+    "togpx": "^0.5.4",
+    "tokml": "^0.4.0",
+    "xmldom": "^0.4.0"
+  }
+}
