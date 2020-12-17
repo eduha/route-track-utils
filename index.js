@@ -176,6 +176,3 @@ app.get('/checkpoints.json', (req, res) => {
  * Go
  */
 app.listen(process.env.PORT);
-
-// TODO remove
-got(`http://localhost:${process.env.PORT}/checkpoints.json?kml=http://localhost:888/test.kml`);
