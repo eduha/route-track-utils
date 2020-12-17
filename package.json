@@ -11,7 +11,6 @@
     "url": "git+https://github.com/eduha/route-track-utils.git"
   },
   "author": "Eduard Faber",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/eduha/route-track-utils/issues"
   },
@@ -26,5 +25,8 @@
     "tokml": "^0.4.0",
     "turf-vincenty-inverse": "1.0.1",
     "xmldom": "^0.4.0"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
