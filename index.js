@@ -96,6 +96,8 @@ app.get('/checkpoints.json', (req, res) => {
   const checkpoints = async (source, from) => {
     const data = await geoJSON(source, from);
 
+    const radius = 0.040;
+
     const track = (data?.features || []).reduce((accumulator, feature) => {
       if (feature?.geometry?.type === 'LineString') {
         return feature.geometry;
@@ -114,7 +116,7 @@ app.get('/checkpoints.json', (req, res) => {
 
     const checkpoints = points.map(feature => {
       const point = turf.nearestPointOnLine(track, feature.geometry);
-      const circle = turf.circle(point, 0.002, {steps: 8});
+      const circle = turf.circle(point, radius, {steps: 8});
 
       return {
         name: feature.properties.name,
@@ -122,6 +124,7 @@ app.get('/checkpoints.json', (req, res) => {
         circle,
         original: feature,
         distance: 0,
+        distances: [],
       };
     });
 
@@ -134,7 +137,9 @@ app.get('/checkpoints.json', (req, res) => {
           const intersect = turf.lineIntersect(segment, checkpoint.circle);
 
           if (intersect.features.length) {
-            checkpoint.distance = accumulator + parseFloat(distance(points[0], intersect.features[0], unit));
+            checkpoint.distance = accumulator + parseFloat(distance(points[0], intersect.features[0], unit)) - radius / 2;
+
+            checkpoint.distances.push(checkpoint.distance);
           }
         });
 
@@ -144,13 +149,52 @@ app.get('/checkpoints.json', (req, res) => {
       return accumulator;
     }, 0);
 
-    const round = v => Math.round(v / 100) / 10;
+    // Сортируем КП по возрастанию
+
+    checkpoints.sort((a, b) => {
+      const a_num = (/^КП\s*(\d+)/.exec(a.name)?.[1] || 0) | 0;
+      const b_num = (/^КП\s*(\d+)/.exec(b.name)?.[1] || 0) | 0;
+
+      if (a_num && !b_num) {
+        return -1;
+      }
+
+      if (!a_num && b_num) {
+        return 1;
+      }
+
+      if (a_num && b_num) {
+        if (a_num === b_num) {
+          return 0;
+        }
+
+        return a_num > b_num ? 1 : -1;
+      }
+
+      return 0;
+    });
+
+    // Первый и последний КП
+
+    checkpoints[0].distance = Math.min(...checkpoints[0].distances);
+    checkpoints[checkpoints.length - 1].distance = Math.max(...checkpoints[checkpoints.length - 1].distances);
+
+    // Если КП расположен ближе к встречной полосе, расстояние будет рассчитано неправильно (как для пути "туда") - исправляем.
+
+    for (let i = 1; i < checkpoints.length - 2; i++) {
+      checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => v > checkpoints[i - 1].distance));
+    }
+
+    // Выводим
+
+    const to_km = v => Math.round(v / 100) / 10;
 
     const output = {
-      total: round(total),
+      total: to_km(total),
       checkpoints: checkpoints.map(checkpoint => ({
         name: checkpoint.name,
-        distance: round(checkpoint.distance),
+        distance: to_km(checkpoint.distance),
+        // distances: checkpoint.distances.map(to_km),
       })),
     };
 
