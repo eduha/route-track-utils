@@ -1,9 +1,10 @@
 const turf = require('@turf/turf');
 const distance = require('turf-vincenty-inverse');
+const toKilometers = require('./toKilometers');
 
 module.exports = async (geoJSON) => {
 
-  const radius = 0.040;
+  const radius = 100; // Максимальное расстояние в метрах от трека до КП, в пределах которого будет происходить поиск
 
   const track = (geoJSON?.features || []).reduce((accumulator, feature) => {
     if (feature?.geometry?.type === 'LineString') {
@@ -23,7 +24,7 @@ module.exports = async (geoJSON) => {
 
   const checkpoints = points.map(feature => {
     const point = turf.nearestPointOnLine(track, feature.geometry);
-    const circle = turf.circle(point, radius, {steps: 8});
+    const circle = turf.circle(point, radius, {steps: 8, units: 'meters'});
 
     return {
       name: feature.properties.name,
@@ -44,7 +45,8 @@ module.exports = async (geoJSON) => {
         const intersect = turf.lineIntersect(segment, checkpoint.circle);
 
         if (intersect.features.length) {
-          checkpoint.distance = accumulator + parseFloat(distance(points[0], intersect.features[0], unit)) - radius / 2;
+          // Отнимаем радиус от вычисленной дистанции, поскольку позднее почти всегда мы будем использовать меньшую из вычисленных дистанций
+          checkpoint.distance = accumulator + parseFloat(distance(points[0], intersect.features[0], unit)) - radius;
 
           checkpoint.distances.push(checkpoint.distance);
         }
@@ -81,15 +83,44 @@ module.exports = async (geoJSON) => {
     return 0;
   });
 
-  // Первый и последний КП
+  // Первый КП
 
   checkpoints[0].distance = Math.min(...checkpoints[0].distances);
-  checkpoints[checkpoints.length - 1].distance = Math.max(...checkpoints[checkpoints.length - 1].distances);
+  if (checkpoints[0].distance <= 2 * radius) {
+    checkpoints[0].distance = 0;
+  }
+
+  // Последний КП
+  // Добавляем два радиуса - один был вычтен при рассчёте, второй для вычисления реального расстояния.
+
+  const l = checkpoints.length - 1;
+
+  checkpoints[l].distance = Math.max(...checkpoints[l].distances) + 2 * radius;
+
+  if (checkpoints[l].distance >= total - 2 * radius && checkpoints[l].distance <= total + 2 * radius) {
+    // Поправка на финиш
+    checkpoints[l].distance = total;
+  }
 
   // Если КП расположен ближе к встречной полосе, расстояние будет рассчитано неправильно (как для пути "туда") - исправляем.
 
   for (let i = 1; i < checkpoints.length - 2; i++) {
-    checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => v > checkpoints[i - 1].distance));
+    checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => {
+      // Оставляем только значения, которые больше чем предыдущий КП
+      if (v <= checkpoints[i - 1].distance) {
+        return false;
+      }
+
+      const adjusted = toKilometers(v + 2 * radius);
+
+      if (adjusted === toKilometers(v)) {
+        // Если поправка не существенна, не делаем следующую проверку
+        return true;
+      }
+
+      // Если при округлении есть два расстояния, с разницей в два радиуса, учитываем бОльшую величину
+      return !checkpoints[i].distances.filter(s => s !== v).map(toKilometers).includes(adjusted);
+    }));
   }
 
   return {
