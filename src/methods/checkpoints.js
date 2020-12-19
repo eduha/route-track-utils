@@ -7,15 +7,30 @@ const trackStats = require('../helpers/trackStats');
 module.exports = (req, res) => {
   const checkpoints = async (source, from) => {
     try {
-      const {total, checkpoints} = await trackStats(geoJSON((await got(source)).body, from));
+      const start_date = req.query.start_date;
+      const {total, checkpoints, brmDistance} = await trackStats(geoJSON((await got(source)).body, from), start_date);
+
+      const times = object => {
+        if (start_date) {
+          return {
+            date: object.date.toISOString().replace(/\..*$/, '').replace('T', ' '),
+            time: object.time
+          };
+        }
+
+        return object.time;
+      };
 
       // Выводим
 
       const output = {
         total: toKilometers(total),
+        brmDistance: toKilometers(brmDistance),
         checkpoints: checkpoints.map(checkpoint => ({
           name: checkpoint.name,
           distance: toKilometers(checkpoint.distance),
+          open: times(checkpoint.open),
+          close: times(checkpoint.close),
         })),
       };
 

@@ -1,8 +1,9 @@
 const turf = require('@turf/turf');
 const distance = require('turf-vincenty-inverse');
 const toKilometers = require('./toKilometers');
+const chechpointTimes = require('./checkpointTimes');
 
-module.exports = async (geoJSON) => {
+module.exports = async (geoJSON, start_date) => {
 
   const radius = 100; // Максимальное расстояние в метрах от трека до КП, в пределах которого будет происходить поиск
 
@@ -57,6 +58,8 @@ module.exports = async (geoJSON) => {
 
     return accumulator;
   }, 0);
+
+  const brmDistance = (require('./brmDistance'))(total / 1000) ;
 
   // Сортируем КП по возрастанию
 
@@ -123,8 +126,19 @@ module.exports = async (geoJSON) => {
     }));
   }
 
+  // Рассчитываем время открытия/закрытия КП
+
+  checkpoints.forEach(checkpoint => {
+    const times = chechpointTimes(Math.min(checkpoint.distance / 1000, brmDistance), start_date);
+
+    checkpoint.start_date = times.start_date;
+    checkpoint.open = times.open;
+    checkpoint.close = times.close;
+  });
+
   return {
     total,
+    brmDistance,
     checkpoints,
   }
 };
