@@ -25,7 +25,7 @@ module.exports = (req, res) => {
 
       const output = {
         total: toKilometers(total),
-        brmDistance: toKilometers(brmDistance),
+        brmDistance,
         checkpoints: checkpoints.map(checkpoint => ({
           name: checkpoint.name,
           distance: toKilometers(checkpoint.distance),
