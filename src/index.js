@@ -5,6 +5,8 @@ if (!process.env.PORT) {
 
 const app = (require('express'))();
 
+app.use((require('cors'))());
+
 /**
  * Скачивание в разных форматах
  */

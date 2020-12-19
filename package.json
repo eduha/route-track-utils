@@ -18,6 +18,7 @@
   "dependencies": {
     "@tmcw/togeojson": "^4.2.0",
     "@turf/turf": "^5.1.6",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "got": "^11.8.1",
     "is-absolute-url": "^3.0.3",
