@@ -8,7 +8,7 @@ const app = (require('express'))();
 /**
  * Скачивание в разных форматах
  */
-app.get('/download.:format(gpx|kml|jpg)$', require('./methods/download'));
+app.get('/download.:format(gpx|kml|jpg|json)$', require('./methods/download'));
 
 /**
  * Список КП

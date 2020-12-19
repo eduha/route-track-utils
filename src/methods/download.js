@@ -7,6 +7,8 @@ const geoJSON = require('../helpers/geojson');
 const toGPX = require('togpx');
 const toKML = require('tokml');
 
+const turf = require('@turf/turf');
+
 module.exports = (req, res) => {
   const download = async (source, from) => {
     try {
@@ -15,30 +17,42 @@ module.exports = (req, res) => {
 
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
-      if (to === 'kml') {
-        res.setHeader('Content-type', 'application/vnd.google-earth.kml+xml');
-      }
-      else if (to === 'gpx') {
-        res.setHeader('Content-type', 'application/gpx+xml');
-      }
-      else if (to === 'jpg') {
-        res.setHeader('Content-type', 'image/jpeg');
+      const mime = {
+        kml: 'application/vnd.google-earth.kml+xml',
+        gpx: 'application/gpx+xml',
+        jpg: 'image/jpeg',
+        json: 'application/json',
+      };
+
+      if (mime[to]) {
+        res.setHeader('Content-type', mime[to]);
       }
 
-      if (from === to || from === 'jpg' || to === 'jpg') {
+      if (from === to || [from, to].includes('jpg')) {
         return got.stream(source).pipe(res);
       }
 
-      const getGeoJSON = async () => geoJSON((await got(source)).body, from);
+      if (['kml', 'gpx'].includes(from) && ['kml', 'gpx', 'json'].includes(to)) {
+        let geoData = geoJSON((await got(source)).body, from);
 
-      if (from === 'kml' && to === 'gpx') {
-        return res.send(toGPX(await getGeoJSON(), {
-          featureDescription: () => '',
-        }));
-      }
+        if (req.query.simplify) {
+          geoData = turf.simplify(geoData, {
+            highQuality: true,
+            tolerance: 0.00001
+          });
+        }
 
-      if (from === 'gpx' && to === 'kml') {
-        return res.send(toKML(await getGeoJSON()));
+        if (to === 'gpx') {
+          return res.send(toGPX(geoData, {featureDescription: () => ''}));
+        }
+
+        if (to === 'kml') {
+          return res.send(toKML(geoData));
+        }
+
+        if (to === 'json') {
+          return res.send(geoData);
+        }
       }
 
       return res.sendStatus(400);
