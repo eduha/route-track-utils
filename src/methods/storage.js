@@ -2,8 +2,10 @@ const files = new Map();
 
 module.exports = (req, res) => {
 
+  // Загружаем файл и храним в памяти
+
   if (req.method === 'POST') {
-    if (req.files?.file) {
+    if (req.files?.file?.md5) {
       files.set(req.files.file.md5, req.files.file);
       return res.send({key: req.files.file.md5});
     }
@@ -11,7 +13,9 @@ module.exports = (req, res) => {
     return res.sendStatus(400);
   }
 
-  if (req.query.key) {
+  // Отдаем файл и удаляем из памяти
+
+  if (req.query?.key) {
     if (files.has(req.query.key)) {
       const file = files.get(req.query.key);
 
