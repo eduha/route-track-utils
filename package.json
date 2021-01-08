@@ -1,6 +1,6 @@
 {
   "name": "route-track-utils",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,7 @@
     "@turf/turf": "^5.1.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.0",
     "got": "^11.8.1",
     "is-absolute-url": "^3.0.3",
     "moment": "^2.29.1",

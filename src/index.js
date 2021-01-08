@@ -6,6 +6,7 @@ if (!process.env.PORT) {
 const app = (require('express'))();
 
 app.use((require('cors'))());
+app.use((require('express-fileupload'))());
 
 /**
  * Скачивание в разных форматах
@@ -16,6 +17,11 @@ app.get('/download.:format(gpx|kml|jpg|json)$', require('./methods/download'));
  * Список КП
  */
 app.get('/checkpoints.json', require('./methods/checkpoints'));
+
+/**
+ * Временная
+ */
+app.use('/storage.json', require('./methods/storage'));
 
 /**
  * Go
