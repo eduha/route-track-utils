@@ -1,6 +1,6 @@
 {
   "name": "route-track-utils",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "got": "^11.8.1",
     "is-absolute-url": "^3.0.3",
     "moment": "^2.29.1",
+    "simplify-geometry": "0.0.2",
     "togpx": "^0.5.4",
     "tokml": "^0.4.0",
     "turf-vincenty-inverse": "1.0.1",

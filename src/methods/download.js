@@ -14,7 +14,7 @@ const toKML = require('tokml');
 const turf = require('@turf/turf');
 
 module.exports = (req, res) => {
-  const download = async (source, from) => {
+  const download = async (source, from, data) => {
     try {
       const to = req.params.format;
       const filename = path.basename(url.parse(source).path || `route.${to}`).replace(new RegExp(`${from}$`, 'i'), to);
@@ -34,11 +34,15 @@ module.exports = (req, res) => {
       }
 
       if (from === to || [from, to].includes('jpg')) {
+        if (data) {
+          return res.send(data);
+        }
+
         return await pipeline(got.stream(source), res);
       }
 
       if (['kml', 'gpx'].includes(from) && ['kml', 'gpx', 'json'].includes(to)) {
-        let geoData = geoJSON((await got(source)).body, from);
+        let geoData = geoJSON(data || (await got(source)).body, from);
 
         if (req.query.simplify) {
           geoData = turf.simplify(geoData, {
@@ -71,6 +75,12 @@ module.exports = (req, res) => {
   // ----------
 
   for (const kind of ['gpx', 'kml', 'jpg', 'ics']) {
+    if (req.method === 'POST') {
+      if (req.files?.[kind]?.name) {
+        return download(req.files[kind].name, kind, req.files[kind].data);
+      }
+    }
+
     if (isAbsoluteUrl(req.query[kind] || '')) {
       return download(req.query[kind], kind);
     }
