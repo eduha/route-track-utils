@@ -41,7 +41,9 @@ module.exports = (req, res) => {
         return await pipeline(got.stream(source), res);
       }
 
-      if (['kml', 'gpx'].includes(from) && ['kml', 'gpx', 'json'].includes(to)) {
+      const allowed = ['kml', 'gpx', 'json'];
+
+      if (allowed.includes(from) && allowed.includes(to)) {
         let geoData = geoJSON(data || (await got(source)).body, from);
 
         if (req.query.simplify) {
@@ -74,7 +76,7 @@ module.exports = (req, res) => {
 
   // ----------
 
-  for (const kind of ['gpx', 'kml', 'jpg', 'ics']) {
+  for (const kind of ['json', 'gpx', 'kml', 'jpg', 'ics']) {
     if (req.method === 'POST') {
       if (req.files?.[kind]?.name) {
         return download(req.files[kind].name, kind, req.files[kind].data);
