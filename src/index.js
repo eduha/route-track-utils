@@ -11,7 +11,7 @@ app.use((require('express-fileupload'))());
 /**
  * Скачивание в разных форматах
  */
-app.get('/download.:format(gpx|kml|jpg|json)$', require('./methods/download'));
+app.use('/download.:format(gpx|kml|jpg|json|ics)$', require('./methods/download'));
 
 /**
  * Список КП

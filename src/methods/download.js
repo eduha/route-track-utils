@@ -22,6 +22,7 @@ module.exports = (req, res) => {
         gpx: 'application/gpx+xml',
         jpg: 'image/jpeg',
         json: 'application/json',
+        ics: 'text/calendar',
       };
 
       if (mime[to]) {
