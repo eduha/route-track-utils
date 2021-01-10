@@ -65,16 +65,10 @@ module.exports = (req, res) => {
 
   // ----------
 
-  if (isAbsoluteUrl(req.query.gpx || '')) {
-    return download(req.query.gpx, 'gpx');
-  }
-
-  if (isAbsoluteUrl(req.query.kml || '')) {
-    return download(req.query.kml, 'kml');
-  }
-
-  if (isAbsoluteUrl(req.query.jpg || '')) {
-    return download(req.query.jpg, 'jpg');
+  for (const kind of ['gpx', 'kml', 'jpg', 'ics']) {
+    if (isAbsoluteUrl(req.query[kind] || '')) {
+      return download(req.query[kind], kind);
+    }
   }
 
   // ----------
