@@ -3,6 +3,10 @@ const got = require('got');
 const url = require('url');
 const path = require('path');
 
+const stream = require('stream');
+const {promisify} = require('util');
+const pipeline = promisify(stream.pipeline);
+
 const geoJSON = require('../helpers/geojson');
 const toGPX = require('togpx');
 const toKML = require('tokml');
@@ -30,7 +34,7 @@ module.exports = (req, res) => {
       }
 
       if (from === to || [from, to].includes('jpg')) {
-        return got.stream(source).pipe(res);
+        return await pipeline(got.stream(source), res);
       }
 
       if (['kml', 'gpx'].includes(from) && ['kml', 'gpx', 'json'].includes(to)) {
@@ -58,7 +62,8 @@ module.exports = (req, res) => {
 
       return res.sendStatus(400);
     }
-    catch {
+    catch (e) {
+      console.error(e);
       return res.sendStatus(500);
     }
   };
