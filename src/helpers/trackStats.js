@@ -59,7 +59,7 @@ module.exports = async (geoJSON, start_date) => {
     return accumulator;
   }, 0);
 
-  const brmDistance = (require('./brmDistance'))(total / 1000) ;
+  const brmDistance = (require('./brmDistance'))(total / 1000);
 
   // Сортируем КП по возрастанию
 
@@ -88,53 +88,60 @@ module.exports = async (geoJSON, start_date) => {
 
   // Первый КП
 
-  checkpoints[0].distance = Math.min(...checkpoints[0].distances);
-  if (checkpoints[0].distance <= 2 * radius) {
-    checkpoints[0].distance = 0;
-  }
+  if (checkpoints.length) {
+    checkpoints[0].distance = Math.min(...checkpoints[0].distances);
 
-  // Последний КП
-  // Добавляем два радиуса - один был вычтен при рассчёте, второй для вычисления реального расстояния.
+    if (checkpoints[0].distance <= 2 * radius) {
+      checkpoints[0].distance = 0;
+    }
 
-  const l = checkpoints.length - 1;
+    // Последний КП
+    // Добавляем два радиуса - один был вычтен при рассчёте, второй для вычисления реального расстояния.
 
-  checkpoints[l].distance = Math.max(...checkpoints[l].distances) + 2 * radius;
+    const l = checkpoints.length - 1;
 
-  if (checkpoints[l].distance >= total - 2 * radius && checkpoints[l].distance <= total + 2 * radius) {
-    // Поправка на финиш
-    checkpoints[l].distance = total;
-  }
+    if (l > 0) {
+      checkpoints[l].distance = Math.max(...checkpoints[l].distances) + 2 * radius;
 
-  // Если КП расположен ближе к встречной полосе, расстояние будет рассчитано неправильно (как для пути "туда") - исправляем.
-
-  for (let i = 1; i < checkpoints.length - 2; i++) {
-    checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => {
-      // Оставляем только значения, которые больше чем предыдущий КП
-      if (v <= checkpoints[i - 1].distance) {
-        return false;
+      if (checkpoints[l].distance >= total - 2 * radius && checkpoints[l].distance <= total + 2 * radius) {
+        // Поправка на финиш
+        checkpoints[l].distance = total;
       }
+    }
 
-      const adjusted = toKilometers(v + 2 * radius);
+    // Если КП расположен ближе к встречной полосе, расстояние будет рассчитано неправильно (как для пути "туда") - исправляем.
 
-      if (adjusted === toKilometers(v)) {
-        // Если поправка не существенна, не делаем следующую проверку
-        return true;
-      }
+    for (let i = 1; i < checkpoints.length - 2; i++) {
+      checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => {
+        // Оставляем только значения, которые больше чем предыдущий КП
+        if (v <= checkpoints[i - 1]?.distance) {
+          return false;
+        }
 
-      // Если при округлении есть два расстояния, с разницей в два радиуса, учитываем бОльшую величину
-      return !checkpoints[i].distances.filter(s => s !== v).map(toKilometers).includes(adjusted);
-    }));
+        const adjusted = toKilometers(v + 2 * radius);
+
+        if (adjusted === toKilometers(v)) {
+          // Если поправка не существенна, не делаем следующую проверку
+          return true;
+        }
+
+        // Если при округлении есть два расстояния, с разницей в два радиуса, учитываем бОльшую величину
+        return !checkpoints[i].distances.filter(s => s !== v).map(toKilometers).includes(adjusted);
+      }));
+    }
   }
 
   // Рассчитываем время открытия/закрытия КП
 
-  checkpoints.forEach(checkpoint => {
-    const times = chechpointTimes(Math.min(checkpoint.distance / 1000, brmDistance), start_date);
+  if (start_date) {
+    checkpoints.forEach(checkpoint => {
+      const times = chechpointTimes(Math.min(checkpoint.distance / 1000, brmDistance), start_date);
 
-    checkpoint.start_date = times.start_date;
-    checkpoint.open = times.open;
-    checkpoint.close = times.close;
-  });
+      checkpoint.start_date = times.start_date;
+      checkpoint.open = times.open;
+      checkpoint.close = times.close;
+    });
+  }
 
   return {
     total,
