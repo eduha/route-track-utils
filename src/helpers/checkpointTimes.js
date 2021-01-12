@@ -93,6 +93,9 @@ module.exports = (distance, start_date) => {
     else if (distance === 300) {
       end = start.add(20, 'hours');
     }
+    else if (distance === 350) {
+      end = start.add(24, 'hours'); // Флеш
+    }
     else if (distance === 400) {
       end = start.add(27, 'hours');
     }
