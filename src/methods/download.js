@@ -19,7 +19,7 @@ module.exports = (req, res) => {
       const to = req.params.format;
       const filename = path.basename(url.parse(source).path || `route.${to}`).replace(new RegExp(`${from}$`, 'i'), to);
 
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(decodeURIComponent(filename))}"`);
 
       const mime = {
         kml: 'application/vnd.google-earth.kml+xml',
