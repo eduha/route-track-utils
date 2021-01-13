@@ -24,7 +24,7 @@ module.exports = async (geoJSON, start_date) => {
   }, []);
 
   const checkpoints = points.map(feature => {
-    const point = turf.nearestPointOnLine(track, feature.geometry);
+    const point = track?.coordinates?.length === 1 ? turf.point(track.coordinates[0]) : turf.nearestPointOnLine(track, feature.geometry);
     const circle = turf.circle(point, radius, {steps: 8, units: 'meters'});
 
     return {
@@ -117,7 +117,7 @@ module.exports = async (geoJSON, start_date) => {
 
     for (let i = 1; i < checkpoints.length - 2; i++) {
       if (checkpoints[i].distances.length) {
-        checkpoints[i].distance = Math.min(0, ...checkpoints[i].distances.filter(v => {
+        const distances = checkpoints[i].distances.filter(v => {
           // Оставляем только значения, которые больше чем предыдущий КП
           if (v <= checkpoints[i - 1]?.distance) {
             return false;
@@ -132,7 +132,11 @@ module.exports = async (geoJSON, start_date) => {
 
           // Если при округлении есть два расстояния, с разницей в два радиуса, учитываем бОльшую величину
           return !checkpoints[i].distances.filter(s => s !== v).map(toKilometers).includes(adjusted);
-        }));
+        });
+
+        if (distances.length) {
+          checkpoints[i].distance = Math.min(...distances);
+        }
       }
     }
   }
