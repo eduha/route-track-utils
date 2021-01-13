@@ -89,7 +89,9 @@ module.exports = async (geoJSON, start_date) => {
   // Первый КП
 
   if (checkpoints.length) {
-    checkpoints[0].distance = Math.min(...checkpoints[0].distances);
+    if (checkpoints[0].distances.length) {
+      checkpoints[0].distance = Math.min(...checkpoints[0].distances);
+    }
 
     if (checkpoints[0].distance <= 2 * radius) {
       checkpoints[0].distance = 0;
@@ -101,7 +103,9 @@ module.exports = async (geoJSON, start_date) => {
     const l = checkpoints.length - 1;
 
     if (l > 0) {
-      checkpoints[l].distance = Math.max(...checkpoints[l].distances) + 2 * radius;
+      if (checkpoints[l].distances.length) {
+        checkpoints[l].distance = Math.max(...checkpoints[l].distances) + 2 * radius;
+      }
 
       if (checkpoints[l].distance >= total - 2 * radius && checkpoints[l].distance <= total + 2 * radius) {
         // Поправка на финиш
@@ -112,22 +116,24 @@ module.exports = async (geoJSON, start_date) => {
     // Если КП расположен ближе к встречной полосе, расстояние будет рассчитано неправильно (как для пути "туда") - исправляем.
 
     for (let i = 1; i < checkpoints.length - 2; i++) {
-      checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => {
-        // Оставляем только значения, которые больше чем предыдущий КП
-        if (v <= checkpoints[i - 1]?.distance) {
-          return false;
-        }
+      if (checkpoints[i].distances.length) {
+        checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => {
+          // Оставляем только значения, которые больше чем предыдущий КП
+          if (v <= checkpoints[i - 1]?.distance) {
+            return false;
+          }
 
-        const adjusted = toKilometers(v + 2 * radius);
+          const adjusted = toKilometers(v + 2 * radius);
 
-        if (adjusted === toKilometers(v)) {
-          // Если поправка не существенна, не делаем следующую проверку
-          return true;
-        }
+          if (adjusted === toKilometers(v)) {
+            // Если поправка не существенна, не делаем следующую проверку
+            return true;
+          }
 
-        // Если при округлении есть два расстояния, с разницей в два радиуса, учитываем бОльшую величину
-        return !checkpoints[i].distances.filter(s => s !== v).map(toKilometers).includes(adjusted);
-      }));
+          // Если при округлении есть два расстояния, с разницей в два радиуса, учитываем бОльшую величину
+          return !checkpoints[i].distances.filter(s => s !== v).map(toKilometers).includes(adjusted);
+        }));
+      }
     }
   }
 
