@@ -117,7 +117,7 @@ module.exports = async (geoJSON, start_date) => {
 
     for (let i = 1; i < checkpoints.length - 2; i++) {
       if (checkpoints[i].distances.length) {
-        checkpoints[i].distance = Math.min(...checkpoints[i].distances.filter(v => {
+        checkpoints[i].distance = Math.min(0, ...checkpoints[i].distances.filter(v => {
           // Оставляем только значения, которые больше чем предыдущий КП
           if (v <= checkpoints[i - 1]?.distance) {
             return false;
