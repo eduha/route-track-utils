@@ -35,7 +35,24 @@ module.exports = async (body, from) => {
 
   if (from === 'kml' || from === 'gpx') {
     const doc = new DOMParser().parseFromString(body.toString());
-    return toGeoJSON[from](doc, {styles: true});
+    const meta = {};
+
+    let document = doc.getElementsByTagName('Document')?.[0];
+    if (document) {
+      for (let i = 0; i < document.childNodes.length; i++) {
+        const child = document.childNodes[i];
+        const tagName = child?.tagName?.toLowerCase();
+
+        if (['name', 'description'].includes(tagName)) {
+          meta[tagName] = child.textContent;
+        }
+      }
+    }
+
+    return {
+      ...toGeoJSON[from](doc),
+      meta,
+    };
   }
 
   if (from === 'json') {

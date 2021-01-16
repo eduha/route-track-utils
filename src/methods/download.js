@@ -51,6 +51,11 @@ module.exports = (req, res) => {
       if (allowed.includes(from) && allowed.includes(to)) {
         let geoData = await geoJSON(data || (await got(source, {responseType: 'buffer'})).body, from);
 
+        if (filename === `route.${to}` && geoData?.meta?.name) {
+          filename = `${geoData.meta.name}.${to}`;
+          res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(decodeURIComponent(filename))}"`);
+        }
+
         if (req.query.simplify) {
           geoData = turf.simplify(geoData, {
             highQuality: true,
