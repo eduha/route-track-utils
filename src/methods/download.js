@@ -17,7 +17,11 @@ module.exports = (req, res) => {
   const download = async (source, from, data) => {
     try {
       const to = req.params.format;
-      const filename = path.basename(url.parse(source).path || `route.${to}`).replace(new RegExp(`${from}$`, 'i'), to);
+      let filename = (path.basename(url.parse(source).path || '').replace(/\?.+$/, '') || `route.${to}`).replace(new RegExp(`${from}$`, 'i'), to);
+
+      if (!filename.includes('.')) {
+        filename = `route.${to}`;
+      }
 
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(decodeURIComponent(filename))}"`);
 
