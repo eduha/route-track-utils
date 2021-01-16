@@ -59,7 +59,7 @@ module.exports = (req, res) => {
         }
 
         if (to === 'gpx') {
-          return res.send(toGPX(geoData, {featureDescription: () => ''}));
+          return res.send(toGPX(geoData, {featureDescription: el => el.description || ''}));
         }
 
         if (to === 'kml') {
