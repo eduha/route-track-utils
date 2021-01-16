@@ -22,6 +22,7 @@ module.exports = (req, res) => {
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(decodeURIComponent(filename))}"`);
 
       const mime = {
+        kmz: 'application/vnd.google-earth.kmz',
         kml: 'application/vnd.google-earth.kml+xml',
         gpx: 'application/gpx+xml',
         jpg: 'image/jpeg',
@@ -41,10 +42,10 @@ module.exports = (req, res) => {
         return await pipeline(got.stream(source), res);
       }
 
-      const allowed = ['kml', 'gpx', 'json'];
+      const allowed = ['kml', 'kmz', 'gpx', 'json'];
 
       if (allowed.includes(from) && allowed.includes(to)) {
-        let geoData = geoJSON(data || (await got(source)).body, from);
+        let geoData = await geoJSON(data || (await got(source, {responseType: 'buffer'})).body, from);
 
         if (req.query.simplify) {
           geoData = turf.simplify(geoData, {
@@ -76,7 +77,7 @@ module.exports = (req, res) => {
 
   // ----------
 
-  for (const kind of ['json', 'gpx', 'kml', 'jpg', 'ics']) {
+  for (const kind of ['json', 'gpx', 'kml', 'kmz', 'jpg', 'ics']) {
     if (req.method === 'POST') {
       if (req.files?.[kind]?.name) {
         return download(req.files[kind].name, kind, req.files[kind].data);

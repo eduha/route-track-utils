@@ -8,7 +8,7 @@ module.exports = (req, res) => {
   const checkpoints = async (source, from) => {
     try {
       const start_date = req.query.start_date;
-      const {total, checkpoints, brmDistance} = await trackStats(geoJSON((await got(source)).body, from), start_date);
+      const {total, checkpoints, brmDistance} = await trackStats(await geoJSON((await got(source)).body, from), start_date);
 
       const times = object => {
         if (start_date) {

@@ -7,16 +7,16 @@ module.exports = async (req, res) => {
 
     if (req.method === 'POST') {
       if (req.files?.data?.data) {
-        const json = (await got.post('https://write.as/api/posts', {
+        const {body} = await got.post('https://write.as/api/posts', {
           json: {
             body: req.files.data.data.toString(),
           },
           responseType: 'json',
-        })).body;
+        });
 
-        if (json.code === 201) {
+        if (body.code === 201) {
           return res.send({
-            key: json.data.id,
+            key: body.data.id,
           });
         }
 

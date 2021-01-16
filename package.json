@@ -1,6 +1,6 @@
 {
   "name": "route-track-utils",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -26,10 +26,12 @@
     "is-absolute-url": "^3.0.3",
     "moment": "^2.29.1",
     "simplify-geometry": "0.0.2",
+    "stream-to-buffer": "^0.1.0",
     "togpx": "^0.5.4",
     "tokml": "^0.4.0",
     "turf-vincenty-inverse": "1.0.1",
-    "xmldom": "^0.4.0"
+    "xmldom": "^0.4.0",
+    "yauzl": "^2.10.0"
   },
   "engines": {
     "node": "14.x"
