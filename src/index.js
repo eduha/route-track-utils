@@ -3,6 +3,8 @@ if (!process.env.PORT) {
   process.exit(1);
 }
 
+require('dotenv').config();
+
 const app = (require('express'))();
 
 app.use((require('cors'))());
@@ -19,9 +21,14 @@ app.use('/download.:format(gpx|kml|jpg|json|ics)$', require('./methods/download'
 app.get('/checkpoints.json', require('./methods/checkpoints'));
 
 /**
- * Временная
+ * Временное хранилище файлов
  */
 app.use('/storage.json', require('./methods/storage'));
+
+/**
+ * Хранилище сниппетов
+ */
+app.use('/snippet.json', require('./methods/snippet'));
 
 /**
  * Go

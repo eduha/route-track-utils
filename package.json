@@ -1,6 +1,6 @@
 {
   "name": "route-track-utils",
-  "version": "1.8.6",
+  "version": "1.9.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,7 @@
     "@tmcw/togeojson": "^4.2.0",
     "@turf/turf": "^5.1.6",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "got": "^11.8.1",
