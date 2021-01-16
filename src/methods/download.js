@@ -86,10 +86,23 @@ module.exports = (req, res) => {
 
   // ----------
 
-  for (const kind of ['json', 'gpx', 'kml', 'kmz', 'jpg', 'ics']) {
+  const kinds = ['json', 'gpx', 'kml', 'kmz', 'jpg', 'ics'];
+
+  for (const kind of kinds) {
     if (req.method === 'POST') {
       if (req.files?.[kind]?.name) {
         return download(req.files[kind].name, kind, req.files[kind].data);
+      }
+    }
+
+    if (isAbsoluteUrl(req.query.load || '')) {
+      const filename = path.basename(url.parse(req.query.load).path || '').replace(/\?.+$/, '') || '';
+      if (filename.includes('.')) {
+        const ext = filename.split('.').reverse()[0].toLowerCase();
+
+        if (kinds.includes(ext)) {
+          return download(req.query.load, ext);
+        }
       }
     }
 
