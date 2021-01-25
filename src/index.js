@@ -11,6 +11,13 @@ app.use((require('cors'))());
 app.use((require('express-fileupload'))());
 
 /**
+ * Информация о версии
+ */
+app.get('/version', (req, res) => {
+  res.send(require('../package').version);
+});
+
+/**
  * Скачивание в разных форматах
  */
 app.use('/download.:format(gpx|kml|jpg|json|ics)$', require('./methods/download'));
