@@ -29,11 +29,11 @@ module.exports = (req, res) => {
       res.setHeader('Content-Disposition', `attachment; filename="${encode(transliterate(filename))}"; filename*=UTF-8''${encode(filename)}`);
 
       const mime = {
-        kmz: 'application/vnd.google-earth.kmz',
-        kml: 'application/vnd.google-earth.kml+xml',
-        gpx: 'application/gpx+xml',
+        kmz: 'application/vnd.google-earth.kmz; charset=utf-8',
+        kml: 'application/vnd.google-earth.kml+xml; charset=utf-8',
+        gpx: 'application/gpx+xml; charset=utf-8',
         jpg: 'image/jpeg',
-        json: 'application/json',
+        json: 'application/json; charset=utf-8',
         ics: 'text/calendar',
       };
 
