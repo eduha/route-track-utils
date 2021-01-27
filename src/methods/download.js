@@ -34,7 +34,7 @@ module.exports = (req, res) => {
         gpx: 'application/gpx+xml; charset=utf-8',
         jpg: 'image/jpeg',
         json: 'application/json; charset=utf-8',
-        ics: 'text/calendar',
+        ics: 'text/calendar; charset=utf-8',
       };
 
       if (mime[to]) {
