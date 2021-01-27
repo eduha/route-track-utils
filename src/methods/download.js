@@ -2,6 +2,7 @@ const isAbsoluteUrl = require('is-absolute-url');
 const got = require('got');
 const url = require('url');
 const path = require('path');
+const {transliterate} = require('transliteration');
 
 const stream = require('stream');
 const {promisify} = require('util');
@@ -23,7 +24,9 @@ module.exports = (req, res) => {
         filename = `route.${to}`;
       }
 
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(decodeURIComponent(filename))}"`);
+      const encode = s => encodeURIComponent(decodeURIComponent(s));
+
+      res.setHeader('Content-Disposition', `attachment; filename="${encode(transliterate(filename))}"; filename*=UTF-8''${encode(filename)}`);
 
       const mime = {
         kmz: 'application/vnd.google-earth.kmz',
@@ -53,7 +56,7 @@ module.exports = (req, res) => {
 
         if (filename === `route.${to}` && geoData?.meta?.name) {
           filename = `${geoData.meta.name}.${to}`;
-          res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(decodeURIComponent(filename))}"`);
+          res.setHeader('Content-Disposition', `attachment; filename="${encode(transliterate(filename))}"; filename*=UTF-8''${encode(filename)}`);
         }
 
         if (req.query.simplify) {
