@@ -1,6 +1,6 @@
 {
   "name": "route-track-utils",
-  "version": "1.9.9",
+  "version": "1.9.10",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "tokml": "^0.4.0",
     "transliteration": "^2.2.0",
     "turf-vincenty-inverse": "1.0.1",
-    "xmldom": "^0.4.0",
+    "xmldom": "^0.5.0",
     "yauzl": "^2.10.0"
   },
   "engines": {
