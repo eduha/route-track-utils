@@ -1,7 +1,3 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy', '--project=track-utils', '--version=$SHORT_SHA']
-artifacts:
-  objects:
-    location: 'gs://cloud-build-artifacts/'
-    paths: ['build']
