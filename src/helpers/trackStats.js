@@ -115,7 +115,7 @@ module.exports = async (geoJSON, start_date) => {
 
     // Если КП расположен ближе к встречной полосе, расстояние будет рассчитано неправильно (как для пути "туда") - исправляем.
 
-    for (let i = 1; i < checkpoints.length - 2; i++) {
+    for (let i = 1; i <= checkpoints.length - 2; i++) {
       if (checkpoints[i].distances.length) {
         const distances = checkpoints[i].distances.filter(v => {
           // Оставляем только значения, которые больше чем предыдущий КП
