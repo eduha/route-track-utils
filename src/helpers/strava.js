@@ -1,6 +1,6 @@
 const got = require('got');
 const cheerio = require('cheerio');
-const {lineString} = require('@turf/helpers');
+const {lineString, featureCollection} = require('@turf/helpers');
 
 module.exports = async link => {
   let name = 'strava';
@@ -51,7 +51,9 @@ module.exports = async link => {
         throw 'no latlng data found';
       }
 
-      const geojson = lineString(latlng.map(([lat, lng]) => [lng, lat]), {name});
+      const geojson = featureCollection([
+        lineString(latlng.map(([lat, lng]) => [lng, lat]), {name}),
+      ]);
 
       return {
         data: JSON.stringify(geojson),
