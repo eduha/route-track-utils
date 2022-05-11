@@ -9,6 +9,7 @@ const {promisify} = require('util');
 const pipeline = promisify(stream.pipeline);
 
 const geoJSON = require('../helpers/geojson');
+const strava = require('../helpers/strava');
 const toGPX = require('togpx');
 const toKML = require('tokml');
 
@@ -18,13 +19,22 @@ module.exports = (req, res) => {
   const download = async (source, from, data) => {
     try {
       const to = req.params.format;
-      let filename = (path.basename(url.parse(source).path || '').replace(/\?.+$/, '') || `route.${to}`).replace(new RegExp(`${from}$`, 'i'), to);
+      let filename;
+
+      if (from === 'strava') {
+        ({data, name: filename} = await strava(source));
+        from = 'json';
+        filename = `${filename}.${to}`;
+      }
+      else {
+        filename = (path.basename(url.parse(source).path || '').replace(/\?.+$/, '') || `route.${to}`).replace(new RegExp(`${from}$`, 'i'), to);
+      }
 
       if (!filename.includes('.')) {
         filename = `route.${to}`;
       }
 
-      const encode = s => encodeURIComponent(decodeURIComponent(s));
+      const encode = s => encodeURIComponent(decodeURIComponent(s)).replace(/^[0-9a-f]{8}-(brm|\d)/g, '$1');
 
       res.setHeader('Content-Disposition', `attachment; filename="${encode(transliterate(filename))}"; filename*=UTF-8''${encode(filename)}`);
 
@@ -96,6 +106,10 @@ module.exports = (req, res) => {
       if (req.files?.[kind]?.name) {
         return download(req.files[kind].name, kind, req.files[kind].data);
       }
+    }
+
+    if (isAbsoluteUrl(req.query.strava || '')) {
+      return download(req.query.strava, 'strava');
     }
 
     if (isAbsoluteUrl(req.query.load || '')) {

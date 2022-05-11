@@ -1,6 +1,6 @@
 {
   "name": "route-track-utils",
-  "version": "1.9.12",
+  "version": "1.10.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -18,6 +18,7 @@
   "dependencies": {
     "@tmcw/togeojson": "^4.2.0",
     "@turf/turf": "^5.1.6",
+    "cheerio": "^1.0.0-rc.10",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
