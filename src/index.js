@@ -6,6 +6,7 @@ if (!process.env.PORT) {
 require('dotenv').config();
 
 const app = (require('express'))();
+const parser = require('body-parser');
 
 app.use((require('cors'))());
 app.use((require('express-fileupload'))());
@@ -36,6 +37,13 @@ app.use('/storage.json', require('./methods/storage'));
  * Хранилище сниппетов
  */
 app.use('/snippet.json', require('./methods/snippet'));
+
+/**
+ * Уведомлялка
+ */
+app.use('/notify', parser.json());
+app.use('/notify', require('./methods/notify'));
+
 
 /**
  * Go
