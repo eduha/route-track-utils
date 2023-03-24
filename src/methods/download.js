@@ -10,6 +10,7 @@ const pipeline = promisify(stream.pipeline);
 
 const geoJSON = require('../helpers/geojson');
 const strava = require('../helpers/strava');
+const alltrails = require('../helpers/alltrails');
 const toGPX = require('togpx');
 const toKML = require('tokml');
 
@@ -23,6 +24,11 @@ module.exports = (req, res) => {
 
       if (from === 'strava') {
         ({data, name: filename} = await strava(source));
+        from = 'json';
+        filename = `${filename}.${to}`;
+      }
+      if (from === 'alltrails') {
+        ({data, name: filename} = await alltrails(source));
         from = 'json';
         filename = `${filename}.${to}`;
       }
@@ -110,6 +116,10 @@ module.exports = (req, res) => {
 
     if (isAbsoluteUrl(req.query.strava || '')) {
       return download(req.query.strava, 'strava');
+    }
+
+    if (isAbsoluteUrl(req.query.alltrails || '')) {
+      return download(req.query.alltrails, 'alltrails');
     }
 
     if (isAbsoluteUrl(req.query.load || '')) {
