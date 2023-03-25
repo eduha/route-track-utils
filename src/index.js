@@ -42,8 +42,13 @@ app.use('/snippet.json', require('./methods/snippet'));
  * Уведомлялка
  */
 app.use('/notify', parser.json());
-app.use('/notify', require('./methods/notify'));
+app.use('/notify', require('./methods/randonneurs.kz/notify'));
 
+/**
+ * Работаем с таблицами
+ */
+app.use('/create-sheet', parser.json());
+app.use('/create-sheet', require('./methods/randonneurs.kz/sheet'));
 
 /**
  * Go
