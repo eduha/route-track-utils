@@ -111,7 +111,7 @@ module.exports = async (req, res) => {
           try {
             Object.entries(body.pairs || {}).forEach(([key, value]) => {
               if (['Телефон', 'Контакт'].includes(key)) {
-                value = `'` + value.trim().replace(/^\+7/, '8');
+                body.pairs[key] = `'` + value.trim().replace(/^\+7/, '8');
               }
             });
 
