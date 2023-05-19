@@ -38,6 +38,7 @@
     "tokml": "^0.4.0",
     "transliteration": "^2.2.0",
     "turf-vincenty-inverse": "1.0.1",
+    "wkx": "^0.5.0",
     "xmldom": "^0.5.0",
     "yauzl": "^2.10.0"
   },

@@ -12,8 +12,6 @@ module.exports = async link => {
   if (url.hostname.replace(/^www\./, '') === 'alltrails.com') {
     const match = /^(\/activities\/(\d+))/.exec(url.pathname);
 
-    console.log(url.pathname)
-
     if (/^\/explore\/map\//.test(url.pathname)) {
       const {body} = await got(url.toString());
 
