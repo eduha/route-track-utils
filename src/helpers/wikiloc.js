@@ -18,8 +18,6 @@ module.exports = async link => {
         const {geom, nom} = mapData[0];
         const name = nom || 'wikiloc';
 
-        const latlng = polyline.decode(geom);
-
         const {coordinates} = wkx.Geometry.parseTwkb(new Buffer.from(geom, 'base64')).toGeoJSON();
 
         if (!coordinates || !coordinates.length) {
