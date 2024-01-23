@@ -1,3 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy', '--project=track-utils', '--version=$SHORT_SHA', '--no-cache', '--bucket=gs://build-artifacts-track-utils']
+  args: ['app', 'deploy', '--project=track-utils', '--version=$SHORT_SHA', '--no-cache']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['storage', 'buckets', 'delete', 'gs://us.artifacts.track-utils.appspot.com']
+#- name: 'gcr.io/cloud-builders/gcloud'
+#  args: ['storage', 'buckets', 'delete', 'gs://build-artifacts-track-utils']
