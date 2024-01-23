@@ -3,7 +3,6 @@ const writeAs = require('../helpers/writeas');
 
 module.exports = async (req, res) => {
   try {
-
     // Загружаем файл на write.as
 
     if (req.method === 'POST') {
