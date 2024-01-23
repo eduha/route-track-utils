@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
       let {message} = req.body || {};
       let token;
 
-      if (['!track', '/track', 'track', 'трек', 'трэк'].includes(message?.text?.trim?.()?.toLowerCase?.()) && message?.reply_to_message && message?.reply_to_message?.document) {
+      if (['!track', '/track', 'track', '!трек', '/трек', 'трек', '!трэк', '/трэк', 'трэк'].includes(message?.text?.trim?.()?.toLowerCase?.()) && message?.reply_to_message && message?.reply_to_message?.document) {
         message = message?.reply_to_message;
       }
 
