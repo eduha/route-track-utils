@@ -1,3 +1,3 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy', '--project=track-utils', '--version=$SHORT_SHA', '--no-cache', '--region=us-east1']
+  args: ['app', 'deploy', '--project=track-utils', '--version=$SHORT_SHA', '--no-cache']
