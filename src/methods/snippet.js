@@ -1,4 +1,5 @@
 const got = require('got');
+const writeAs = require('../helpers/writeas');
 
 module.exports = async (req, res) => {
   try {
@@ -7,17 +8,10 @@ module.exports = async (req, res) => {
 
     if (req.method === 'POST') {
       if (req.files?.data?.data) {
-        const {body} = await got.post('https://write.as/api/posts', {
-          json: {
-            body: req.files.data.data.toString(),
-          },
-          responseType: 'json',
-        });
+        const key = await writeAs(req.files.data.data.toString());
 
-        if (body.code === 201) {
-          return res.send({
-            key: body.data.id,
-          });
+        if (key) {
+          return res.send({key});
         }
 
         return res.sendStatus(502);

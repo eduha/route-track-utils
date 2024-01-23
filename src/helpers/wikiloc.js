@@ -1,6 +1,4 @@
 const got = require('got');
-const cheerio = require('cheerio');
-const polyline = require('@mapbox/polyline');
 const {lineString, featureCollection} = require('@turf/helpers');
 const wkx = require('wkx');
 
@@ -8,7 +6,6 @@ module.exports = async link => {
   const url = new URL(link);
 
   if (/wikiloc\.com$/.test(url.hostname)) {
-
     const {body} = await got(url.toString());
 
     for (let line of body.split('\n')) {
@@ -35,7 +32,6 @@ module.exports = async link => {
         };
       }
     }
-
   }
 
   throw 'unsupported url';

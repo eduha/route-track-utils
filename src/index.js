@@ -8,6 +8,8 @@ require('dotenv').config();
 const app = (require('express'))();
 const parser = require('body-parser');
 
+app.set('trust proxy', true);
+
 app.use((require('cors'))());
 app.use((require('express-fileupload'))());
 
@@ -49,6 +51,12 @@ app.use('/notify', require('./methods/randonneurs.kz/notify'));
  */
 app.use('/create-sheet', parser.json());
 app.use('/create-sheet', require('./methods/randonneurs.kz/sheet'));
+
+/**
+ * Телеграм-бот для конвертации файлов в ссылки на редактор
+ */
+app.use('/file-convert-bot', parser.json());
+app.use('/file-convert-bot', require('./methods/randonneurs.kz/file-convert-bot'));
 
 /**
  * Go
