@@ -109,12 +109,6 @@ module.exports = async (req, res) => {
         // Google Sheets
         (async () => {
           try {
-            Object.entries(body.pairs || {}).forEach(([key, value]) => {
-              if (['Телефон', 'Контакт'].includes(key)) {
-                body.pairs[key] = `'` + value.trim().replace(/^\+7/, '8');
-              }
-            });
-
             const {pairs, sheet_id, key, owner} = body;
 
             if (sheet_id && key && owner) {
@@ -149,7 +143,7 @@ module.exports = async (req, res) => {
                       pairs['Возраст'],
                       pairs['Телефон'],
                       pairs['Имя близкого человека и контактный телефон'],
-                    ],
+                    ].map(v => typeof v === 'string' ? v.replace(/^\+/, "'+") : v),
                   ],
                 },
               });

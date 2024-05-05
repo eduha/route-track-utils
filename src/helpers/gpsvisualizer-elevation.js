@@ -1,9 +1,22 @@
 const got = require('got');
 const cheerio = require('cheerio');
 const FormData = require('form-data');
+const Crypto = require('crypto');
+const NodeCache = require('node-cache');
+
+const cache = new NodeCache({
+  stdTTL: 3600,
+  useClones: false,
+});
 
 module.exports = async (gpx_string) => {
   try {
+    const cid = Crypto.createHash('md5').update(gpx_string).digest('hex').toUpperCase();
+
+    if (cache.has(cid)) {
+      return cache.get(cid);
+    }
+
     const instance = got.extend({prefixUrl: 'https://www.gpsvisualizer.com'});
 
     const form = new FormData();
@@ -38,6 +51,8 @@ module.exports = async (gpx_string) => {
     }
 
     const {body: gpx} = await instance(href.replace(/^\//, ''));
+
+    cache.set(cid, gpx);
 
     return gpx;
   }

@@ -34,6 +34,7 @@
     "got": "^11.8.1",
     "is-absolute-url": "^3.0.3",
     "moment": "^2.29.1",
+    "node-cache": "^5.1.2",
     "promise-limit": "^2.7.0",
     "simplify-geometry": "0.0.2",
     "stream-to-buffer": "^0.1.0",
