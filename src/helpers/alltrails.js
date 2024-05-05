@@ -5,13 +5,10 @@ const {lineString, featureCollection} = require('@turf/helpers');
 
 module.exports = async link => {
   let name = 'alltrails';
-  let {hostname} = new URL(link);
 
   const url = new URL(link);
 
   if (url.hostname.replace(/^www\./, '') === 'alltrails.com') {
-    const match = /^(\/activities\/(\d+))/.exec(url.pathname);
-
     if (/^\/explore\/map\//.test(url.pathname)) {
       const {body} = await got(url.toString());
 

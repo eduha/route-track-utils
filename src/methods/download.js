@@ -9,6 +9,7 @@ const {promisify} = require('util');
 const pipeline = promisify(stream.pipeline);
 
 const geoJSON = require('../helpers/geojson');
+const elevation = require('../helpers/gpsvisualizer-elevation');
 const strava = require('../helpers/strava');
 const alltrails = require('../helpers/alltrails');
 const wikiloc = require('../helpers/wikiloc');
@@ -16,6 +17,8 @@ const toGPX = require('togpx');
 const toKML = require('tokml');
 
 const turf = require('@turf/turf');
+const {featureCollection, lineString} = require('@turf/helpers');
+const polyline = require('@mapbox/polyline');
 
 module.exports = (req, res) => {
   const download = async (source, from, data) => {
@@ -23,7 +26,22 @@ module.exports = (req, res) => {
       const to = req.params.format;
       let filename;
 
-      if (from === 'strava') {
+      if (from === 'polyline') {
+        const latlng = polyline.decode(source, 5);
+
+        if (!latlng || !latlng.length) {
+          throw 'no latlng data found';
+        }
+
+        const name = req.body?.name || 'track';
+        from = 'json';
+        filename = `${name}.${to}`;
+
+        data = JSON.stringify(featureCollection([
+          lineString(latlng, {name}),
+        ]));
+      }
+      else if (from === 'strava') {
         ({data, name: filename} = await strava(source));
         from = 'json';
         filename = `${filename}.${to}`;
@@ -63,7 +81,7 @@ module.exports = (req, res) => {
         res.setHeader('Content-type', mime[to]);
       }
 
-      if (from === to || [from, to].includes('jpg')) {
+      if ((from === to && !req.query.simplify && !req.query.elevation) || [from, to].includes('jpg')) {
         if (data) {
           return res.send(data);
         }
@@ -81,11 +99,15 @@ module.exports = (req, res) => {
           res.setHeader('Content-Disposition', `attachment; filename="${encode(transliterate(filename))}"; filename*=UTF-8''${encode(filename)}`);
         }
 
-        if (req.query.simplify) {
+        if (req.query.simplify || req.query.elevation) {
           geoData = turf.simplify(geoData, {
             highQuality: true,
-            tolerance: 0.00001
+            tolerance: 0.00001,
           });
+        }
+
+        if (req.query.elevation) {
+          geoData = await geoJSON(await elevation(toGPX(geoData)), 'gpx');
         }
 
         if (to === 'gpx') {
@@ -112,6 +134,10 @@ module.exports = (req, res) => {
   // ----------
 
   const kinds = ['json', 'gpx', 'kml', 'kmz', 'jpg', 'ics'];
+
+  if (req.body?.polyline) {
+    return download(req.body?.polyline, 'polyline');
+  }
 
   for (const kind of kinds) {
     if (req.method === 'POST') {

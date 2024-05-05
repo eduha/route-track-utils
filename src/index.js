@@ -23,7 +23,7 @@ app.get('/version', (req, res) => {
 /**
  * Скачивание в разных форматах
  */
-app.use('/download.:format(gpx|kml|jpg|json|ics)$', require('./methods/download'));
+app.use('/download.:format(gpx|kml|jpg|json|ics)$', parser.json(), require('./methods/download'));
 
 /**
  * Список КП
@@ -43,20 +43,17 @@ app.use('/snippet.json', require('./methods/snippet'));
 /**
  * Уведомлялка
  */
-app.use('/notify', parser.json());
-app.use('/notify', require('./methods/randonneurs.kz/notify'));
+app.use('/notify', parser.json(), require('./methods/randonneurs.kz/notify'));
 
 /**
  * Работаем с таблицами
  */
-app.use('/create-sheet', parser.json());
-app.use('/create-sheet', require('./methods/randonneurs.kz/sheet'));
+app.use('/create-sheet', parser.json(), require('./methods/randonneurs.kz/sheet'));
 
 /**
  * Телеграм-бот для конвертации файлов в ссылки на редактор
  */
-app.use('/file-convert-bot', parser.json());
-app.use('/file-convert-bot', require('./methods/randonneurs.kz/file-convert-bot'));
+app.use('/file-convert-bot', parser.json(), require('./methods/randonneurs.kz/file-convert-bot'));
 
 /**
  * Go
