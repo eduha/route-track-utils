@@ -8,7 +8,7 @@ module.exports = async link => {
 
   if (hostname === 'strava.app.link') {
     const {body} = await got(link);
-    const match = /(https:\/\/www\.strava\.com\/activities\/\d+\/)/.exec(body);
+    const match = /(https:\/\/www\.strava\.com\/activities\/\d+)/.exec(body);
 
     if (match) {
       link = match[1];
