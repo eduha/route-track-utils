@@ -127,6 +127,7 @@ module.exports = async (req, res) => {
               const [last] = (values || []).slice(-1);
               const index = (values || []).length + 1;
               const num = (last ? (last[0] | 0) : 0) + 1;
+              const row = index + 1;
 
               // Зададим заголовки
               await sheetsClient.spreadsheets.values.update({
@@ -153,6 +154,9 @@ module.exports = async (req, res) => {
                       'Финиш',
                       'Время',
                       'Клуб',
+                      '',
+                      '',
+                      '',
                     ],
                   ],
                 },
@@ -180,7 +184,7 @@ module.exports = async (req, res) => {
                       '',
                       '',
                       '',
-                      `=IF(O${index};O${index}-N${index};"")`,
+                      `=IF(O${row};O${row}-N${row};"")`,
                       'Клуб',
                     ].map(v => typeof v === 'string' ? v.replace(/^\+/, "'+") : v),
                   ],
