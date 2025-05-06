@@ -126,6 +126,37 @@ module.exports = async (req, res) => {
 
               const [last] = (values || []).slice(-1);
               const index = (values || []).length + 1;
+              const num = (last ? (last[0] | 0) : 0) + 1;
+
+              // Зададим заголовки
+              await sheetsClient.spreadsheets.values.update({
+                spreadsheetId: sheet_id,
+                range: 'A1',
+                valueInputOption: 'USER_ENTERED',
+                requestBody: {
+                  values: [
+                    [
+                      '№',
+                      'Фамилия',
+                      'Имя',
+                      'Last name',
+                      'First name',
+                      'Город',
+                      'Возраст',
+                      'Телефон',
+                      'Контакт',
+                      'Старт',
+                      'Сход',
+                      'Взнос',
+                      'Медаль',
+                      'Старт',
+                      'Финиш',
+                      'Время',
+                      'Клуб',
+                    ],
+                  ],
+                },
+              });
 
               await sheetsClient.spreadsheets.values.append({
                 spreadsheetId: sheet_id,
@@ -134,7 +165,7 @@ module.exports = async (req, res) => {
                 requestBody: {
                   values: [
                     [
-                      (last ? (last[0] | 0) : 0) + 1,
+                      num,
                       pairs['Фамилия'],
                       pairs['Имя'],
                       pairs['Фамилия латиницей'],
@@ -143,6 +174,14 @@ module.exports = async (req, res) => {
                       pairs['Возраст'],
                       pairs['Телефон'],
                       pairs['Имя близкого человека и контактный телефон'],
+                      '',
+                      '',
+                      '',
+                      '',
+                      '',
+                      '',
+                      `=IF(O${index};O${index}-N${index};"")`,
+                      'Клуб',
                     ].map(v => typeof v === 'string' ? v.replace(/^\+/, "'+") : v),
                   ],
                 },
