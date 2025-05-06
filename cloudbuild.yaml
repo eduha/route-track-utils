@@ -1,7 +1,12 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy', '--project=track-utils', '--version=$SHORT_SHA', '--no-cache']
+
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['storage', 'rm', '--recursive', 'gs://us.artifacts.track-utils.appspot.com']
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      gcloud storage rm --recursive gs://us.artifacts.track-utils.appspot.com || echo "Ignore error"
 #- name: 'gcr.io/cloud-builders/gcloud'
 #  args: ['storage', 'buckets', 'delete', 'gs://build-artifacts-track-utils']
