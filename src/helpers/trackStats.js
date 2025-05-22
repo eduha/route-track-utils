@@ -144,8 +144,16 @@ module.exports = async (geoJSON, start_date) => {
   // Рассчитываем время открытия/закрытия КП
 
   if (start_date) {
-    checkpoints.forEach(checkpoint => {
-      const times = chechpointTimes(Math.min(checkpoint.distance / 1000, brmDistance), start_date);
+    const lastIndex = checkpoints.length - 1;
+
+    checkpoints.forEach((checkpoint, index) => {
+      let distance = Math.min(checkpoint.distance / 1000, brmDistance);
+
+      if (index === lastIndex && distance > (brmDistance - 10)) {
+        distance = brmDistance;
+      }
+
+      const times = chechpointTimes(distance, start_date);
 
       checkpoint.start_date = times.start_date;
       checkpoint.open = times.open;
