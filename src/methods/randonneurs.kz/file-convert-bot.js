@@ -25,6 +25,19 @@ module.exports = async (req, res) => {
         token = req.query?.token;
       }
 
+      if (token && message?.text?.trim?.()?.indexOf?.('/chatid') === 0) {
+        return res.send({
+          method: 'sendMessage',
+          chat_id: message?.chat?.id,
+          text: String(message?.chat?.id),
+          disable_notification: true,
+          reply_parameters: {
+            message_id: message?.message_id,
+            chat_id: message?.chat?.id,
+          },
+        });
+      }
+
       if (token && message?.document?.file_name) {
         const allowed = ['kml', 'kmz', 'gpx'];
         const match = message.document.file_name?.match?.(new RegExp(`\.(${allowed.join('|')})$`, 'i'));
