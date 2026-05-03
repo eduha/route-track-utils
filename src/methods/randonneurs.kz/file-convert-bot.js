@@ -25,6 +25,45 @@ module.exports = async (req, res) => {
         token = req.query?.token;
       }
 
+      if (message?.new_chat_members?.length) {
+        const chatId = String(message.chat?.id);
+        const messageId = message.message_id;
+        const fromId = message.from?.id;
+
+        for (const member of message.new_chat_members) {
+          if (member.is_bot) {
+            console.log(`new_chat_members: skip bot ${member.id}`);
+            continue;
+          }
+
+          if (member.id !== fromId) {
+            console.log(`new_chat_members: skip member ${member.id}, added by ${fromId}`);
+            continue;
+          }
+
+          try {
+            await got.post(`https://events.randonneurs.kz/api/webhook/telegram-new-member`, {
+              json: {
+                chatId,
+                messageId,
+                user: {
+                  id: String(member.id),
+                  firstName: member.first_name || '',
+                  lastName: member.last_name || '',
+                  username: member.username || '',
+                },
+              },
+              timeout: {request: 10000},
+            });
+          }
+          catch (e) {
+            console.error('Failed to forward new member:', e.message);
+          }
+        }
+
+        return res.sendStatus(200);
+      }
+
       if (token && message?.text?.trim?.()?.indexOf?.('/chatid') === 0) {
         return res.send({
           method: 'sendMessage',
