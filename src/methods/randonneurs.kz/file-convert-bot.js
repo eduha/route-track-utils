@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
           }
 
           try {
-            await got.post(`https://events.randonneurs.kz/api/webhook/telegram-new-member`, {
+            await got.post(`https://www.randonneurs.kz/api/webhook/telegram-new-member`, {
               json: {
                 chatId,
                 messageId,
@@ -147,6 +147,35 @@ module.exports = async (req, res) => {
               },
             });
           }
+        }
+      }
+
+      if (message?.chat?.type === 'private' &&
+          (message?.forward_from || message?.forward_sender_name)) {
+        const payload = {
+          chatId: String(message.chat.id),
+          messageId: message.message_id,
+        };
+
+        if (message.forward_from) {
+          payload.userId = String(message.forward_from.id);
+          if (message.forward_from.username) {
+            payload.username = message.forward_from.username;
+          }
+        }
+
+        if (message.forward_sender_name) {
+          payload.forwardSenderName = message.forward_sender_name;
+        }
+
+        try {
+          await got.post('https://www.randonneurs.kz/api/webhook/telegram-whois', {
+            json: payload,
+            timeout: {request: 10000},
+          });
+        }
+        catch (e) {
+          console.error('Failed to forward whois:', e.message);
         }
       }
     }
