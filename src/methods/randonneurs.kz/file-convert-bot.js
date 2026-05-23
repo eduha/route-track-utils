@@ -178,6 +178,23 @@ module.exports = async (req, res) => {
           console.error('Failed to forward whois:', e.message);
         }
       }
+
+      if (message?.chat?.type === 'private' &&
+          message?.text?.includes?.('t.me/c/')) {
+        try {
+          await got.post('https://www.randonneurs.kz/api/webhook/telegram-whois', {
+            json: {
+              chatId: String(message.chat.id),
+              messageId: message.message_id,
+              messageLink: message.text.trim(),
+            },
+            timeout: {request: 10000},
+          });
+        }
+        catch (e) {
+          console.error('Failed to forward whois link:', e.message);
+        }
+      }
     }
   }
   catch (e) {
